@@ -1,0 +1,70 @@
+volumes:
+  postgres:
+  synapse:
+services:
+  postgres:
+    image: docker.io/postgres
+    container_name: postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ./server/sql-init:/docker-entrypoint-initdb.d:z
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+  mailtutan:
+    image: docker.io/mailtutan/mailtutan:latest
+    labels:
+      - traefik.http.routers.mailtutan.rule=Host(`mail.localhost`)
+      - traefik.http.services.mailtutan.loadbalancer.server.port=1080
+  traefik:
+    image: docker.io/traefik:latest
+    privileged: true
+    command:
+      - "--entrypoints.web.address=:80"
+      - "--providers.docker=true"
+    volumes:
+      - /run/podman/podman.sock:/var/run/docker.sock:z
+    ports:
+      - 80:80
+  synapse:
+    image: docker.io/matrixdotorg/synapse:develop
+    environment:
+      - SYNAPSE_CONFIG_PATH=/config/homeserver.yaml
+    depends_on:
+      - postgres
+    labels:
+      - traefik.http.routers.synapse.rule=Host(`synapse.localhost`)
+      - traefik.http.services.synapse.loadbalancer.server.port=8008
+    volumes:
+      - synapse:/data:z
+      - ./server/homeserver.yaml:/config/homeserver.yaml:z
+      - ./server/matrix.localdomain.log.config:/config/matrix.localdomain.log.config:z
+      - ./server/matrix.localdomain.signing.key:/config/matrix.localdomain.signing.key:z
+  mas:
+    image: ghcr.io/matrix-org/matrix-authentication-service:main
+    volumes:
+      - ./server/mas.yaml:/config.yaml:z
+    depends_on:
+      - postgres
+    command:
+      - server
+      - --migrate
+      - --config=/config.yaml
+    labels:
+      - traefik.http.routers.mas.rule=Host(`mas.matrix.localhost`)
+      - traefik.http.services.mas.loadbalancer.server.port=8080
+  mas-proxy:
+    build:
+      context: ./oauth-proxy
+    environment:
+      - MAS=http://mas:8080
+      - BASE_DOMAIN=http://matrix.localdomain
+      - PORT=8000
+    labels:
+      - traefik.http.routers.mas-proxy.rule=Host(`auth.matrix.localhost`)
+      - traefik.http.services.mas-proxy.loadbalancer.server.port=8000
+  matrix-proxy:
+    build:
+      context: ./matrix-proxy
+    labels:
+      - traefik.http.routers.matrix-proxy.rule=Host(`matrix.localdomain`)
+      - traefik.http.services.matrix-proxy.loadbalancer.server.port=80

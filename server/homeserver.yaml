@@ -1,0 +1,60 @@
+# Configuration file for Synapse.
+# For more information on how to configure Synapse, including a complete accounting of
+# each option, go to docs/usage/configuration/config_documentation.md or
+# https://matrix-org.github.io/synapse/latest/usage/configuration/config_documentation.html
+server_name: "matrix.localdomain"
+public_baseurl: "http://matrix.localdomain"
+serve_server_wellknown: true
+pid_file: /data/homeserver.pid
+listeners:
+  - port: 8008
+    tls: false
+    type: http
+    x_forwarded: true
+    resources:
+      - names: [client, federation]
+        compress: false
+database:
+  name: psycopg2
+  txn_limit: 10000
+  args:
+    user: synapse
+    password: password
+    database: synapse
+    host: postgres
+    port: 5432
+    cp_min: 5
+    cp_max: 10
+log_config: "/config/matrix.localdomain.log.config"
+media_store_path: /data
+registration_shared_secret: "Haq2764TDNc6N~bL8zrWKhzZuNVx7hKi14@5*7QY4Gcv2Xy2JO"
+report_stats: true
+macaroon_secret_key: "Srr&TT^z4o#R*obIzI,m=MH71Ec-vW6=z2@=GH0s=3UD~mGOWZ"
+form_secret: "nv22;Ew1Mi=tEM;j7hz7O9D=B-6NvWS@gRGG*.T4iVLnWW~Mpt"
+signing_key_path: "/config/matrix.localdomain.signing.key"
+trusted_key_servers:
+  - server_name: "matrix.org"
+
+auth:
+  oauth_delegation_enabled: true
+experimental_features:
+  msc3861:
+    enabled: true
+
+    # Synapse will call `{issuer}/.well-known/openid-configuration` to get the OIDC configuration
+    issuer: http://auth.matrix.localhost
+
+    # Matches the `client_id` in the auth service config
+    client_id: 0000000000000000000SYNAPSE
+    # Matches the `client_auth_method` in the auth service config
+    client_auth_method: client_secret_basic
+    # Matches the `client_secret` in the auth service config
+    client_secret: "SomeRandomSecret"
+
+    # Matches the `matrix.secret` in the auth service config
+    admin_token: "AA7ojdIPO1GCikEVF6d3BT15Q8hOe6hB"
+
+    # URL to advertise to clients where users can self-manage their account
+    account_management_url: "http://auth.matrix.localhost/account"
+
+# vim:ft=yaml
