@@ -43,6 +43,9 @@ Note: matrix api server sends the introspection request to the public domain set
 
 This is shallow shell that builds around `matrix-react-sdk` and provides the complete client.
 
+Follow the [getting started guide](https://github.com/vector-im/element-web/#setting-up-a-dev-environment). Use
+[element.config.json](element.config.json) as `config.json` for element-web.
+
 Following things are being verified:
 - [ ] Theming: We can customize the theme and apply it. However, how to do it exactly is yet to be seen
 - [ ] Extension of the platform using bots and apps
