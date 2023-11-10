@@ -7,7 +7,7 @@
 ## Getting Started
 
 ```bash
-# cmd for creating configuration file. One is already generated for you
+# Optional. cmd for creating configuration file. One is already generated for you
 sudo podman run -v synapse:/data:z -e SYNAPSE_SERVER_NAME=matrix.localhost -e SYNAPSE_REPORT_STATS=yes docker.io/matrixdotorg/synapse:latest generate
 
 
@@ -20,9 +20,6 @@ sudo podman run -v ./server/mas.yaml:/config.yaml:z --network=matrix_default ghc
 
 # note: synapse might fail to initialize data on first run due to postgres taking some time to initialize. Simply restart synapse after few seconds
 
-
-## create a admin user using 
-sudo podman exec -it systemd-synapse bash -c "register_new_matrix_user -c /data/homeserver.yaml"
 ```
 
 ## Architecture
@@ -42,7 +39,7 @@ Note: matrix api server sends the introspection request to the public domain set
 ```
 # /etc/hosts
 
-# public url of your local interface. synapse uses this domain to call introspection url
+# public ip of your local interface. synapse uses this domain to call introspection url
 # also, this needs to be available via browser for login
 192.168.18.109 matrix.localdomain
 ```
