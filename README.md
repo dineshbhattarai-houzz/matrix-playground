@@ -60,8 +60,15 @@ Following things are being verified:
 - [ ] Automatic acceptance of invite
 
 ### Custom API
-- API to get a room: this endpoint would create a new matrix room or return preexisting room
+API to get a room: this endpoint would create a new matrix room or return preexisting room
 	when a project id is provided. It would invite members to the room as well. Note: due to the architechture
 	the members would need to accept the invitation to join. This should be doable by listening to 
 	invite events.
+
+We implement `auth.matrix.localhost/oauth2/introspect` endpoint. This is just a proxy that returns early for some case and int other 
+cases, it would just forward the request to `matrix-authentication-service`. This endpoint needs to live in this path since we are 
+acting as middleman for the standard oauth endpoint.
+
+Also there is `auth.matrix.localhost/api/project/[id]`. This endpoint creates a new room or returns existing room for given project id. ID is an
+opaque room id. This endpoint could live anywhere and has no reason to be inside this path.
 
