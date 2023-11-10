@@ -20,6 +20,7 @@ export default async function getProjectRoom(
     is_direct: false,
     name: `Project: ${projectId}`,
     preset: "trusted_private_chat",
+    invite: ["@dineshdb:matrix.localdomain", "@dineshdb2:matrix.localdomain"],
   });
 
   await kv.set([key, projectId], roomId);
@@ -28,11 +29,6 @@ export default async function getProjectRoom(
 }
 
 async function joinAndReturn(roomId: string) {
-  const res2 = await houzzbotClient.invite(
-    roomId,
-    "@dineshdb:matrix.localdomain"
-  );
-
   return new Response(undefined, {
     status: 303,
     headers: {
