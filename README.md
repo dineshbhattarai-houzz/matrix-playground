@@ -37,7 +37,15 @@ details about Houzz Pro's and remove the need for login endpoints altogether.
 TODO: The get profile endpoint from element web gives error. Which means there should be another 
 endpoint that's failing. However, we won't need to show the chat user profile so that seems to be low priority.
 
-Note: matrix api server sends the introspection request to the public domain set. As a result, you need to 
+Note: matrix api server sends the introspection request to the public domain set. As a result, you need to set `/etc/hosts`
+
+```
+# /etc/hosts
+
+# public url of your local interface. synapse uses this domain to call introspection url
+# also, this needs to be available via browser for login
+192.168.18.109 matrix.localdomain
+```
 
 ### Element Web
 
@@ -57,10 +65,3 @@ Following things are being verified:
 	the members would need to accept the invitation to join. This should be doable by listening to 
 	invite events.
 
-```
-# /etc/hosts
-
-# public url of your local interface. synapse uses this domain to call introspection url
-# also, this needs to be available via browser for login
-192.168.18.109 matrix.localdomain
-```
