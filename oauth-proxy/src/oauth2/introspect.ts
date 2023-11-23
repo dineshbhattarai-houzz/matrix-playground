@@ -5,9 +5,10 @@ export default async function (req: Request) {
   const body = await req.clone().formData();
   const token: string = body.get("token")! as string;
 
-  if (tokenUsers[token]) {
+  const internalUser = tokenUsers[token];
+  if (internalUser) {
     console.log("internal user", token);
-    return Response.json(tokenUsers[token]);
+    return Response.json(internalUser);
   }
 
   return proxy(mas)(req);

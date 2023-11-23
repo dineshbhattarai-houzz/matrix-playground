@@ -4,7 +4,6 @@ volumes:
 services:
   postgres:
     image: docker.io/postgres
-    container_name: postgres
     volumes:
       - postgres:/var/lib/postgresql/data
       - ./server/sql-init:/docker-entrypoint-initdb.d:z
@@ -57,7 +56,7 @@ services:
       context: ./oauth-proxy
     environment:
       - MAS=http://mas:8080
-      - BASE_DOMAIN=http://matrix.localdomain
+      - HOMESERVER_URL=http://matrix.localdomain
       - PORT=8000
     labels:
       - traefik.http.routers.mas-proxy.rule=Host(`auth.matrix.localhost`)
