@@ -1,3 +1,4 @@
+import init from "./src/api/init.ts";
 import getProjectByProjectId from "./src/api/project/[id].ts";
 import { mas, port } from "./src/config.ts";
 import introspect from "./src/oauth2/introspect.ts";
@@ -14,6 +15,8 @@ router.options("/*", () => {
     },
   });
 });
+
+router.all("/api/init", init);
 router.all("/oauth2/introspect", introspect);
 router.get("/api/project/:id", getProjectByProjectId);
 

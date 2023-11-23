@@ -1,7 +1,7 @@
 import { matrixSdk } from "../deps.ts";
 
 export const mas = Deno.env.get("MAS");
-export const homeServerUrl = Deno.env.get("BASE_DOMAIN");
+export const homeServerUrl = Deno.env.get("HOMESERVER_URL");
 export const elementUrl = Deno.env.get("Element_DOMAIN");
 export const port = Deno.env.get("PORT") ?? "8080";
 
@@ -16,7 +16,7 @@ export function getClient(userId: string): matrixSdk.MatrixClient {
 }
 export const houzzbotClient = getClient("houzzbot");
 
-export const tokenUsers: Record<string, unknown> = {
+export const tokenUsers: Record<string, Record<string, unknown>> = {
   dineshdb1: {
     active: true,
     scope:
@@ -44,7 +44,7 @@ export const tokenUsers: Record<string, unknown> = {
   houzzbot: {
     active: true,
     scope:
-      "urn:matrix:org.matrix.msc2967.client:api:* urn:matrix:org.matrix.msc2967.client:device:nQGSKPKVNC",
+      "urn:synapse:admin:* urn:matrix:org.matrix.msc2967.client:api:* urn:matrix:org.matrix.msc2967.client:device:nQGSKPKVNC",
     client_id: "legacy",
     username: "houzzbot",
     token_type: "access_token",
