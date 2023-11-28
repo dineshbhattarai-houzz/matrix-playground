@@ -48,6 +48,7 @@ set. As a result, you need to set `/etc/hosts`
 # public ip of your local interface. synapse uses this domain to call introspection url
 # also, this needs to be available via browser for login
 192.168.18.109 matrix.localdomain
+
 ```
 
 ### Element Web
@@ -85,12 +86,10 @@ live in this path since we are acting as middleman for the standard oauth
 endpoint.
 
 ## Known Issues
+- Element web contains many features we don't actually require such as: configuration reload watching, settings watch, jitsi call. I think we can delete half of the stuff and create a lighter weight component by incrementally replacing the components one by one. With enough deletion, we will have only enough components that we need. For changing the whole way element works, we could replace the base elements with houzz components and it would look like houzz.
+- Interactive Bots: This one's messy. There are two paths
+  - Modals: We could show modals, which work fantastically already.
+  - Inline: We create custom URIs like houzz://quiz/xw4a3fc and then intercept the `LinkPreviewWidget` to show a custom html widget that would interact as it would on a dialog.
 
-- matrix-proxy is a nginx proxy which provides some compatibility proxying. It
-  might give gateway error if it fails to detect that upstream is down and might
-  fail to detect that it is up again. Simply restarting it should fix it. The
-  problem is with nginx config but I haven't bothered to fix it.
-- When houzzbot replies to a conversation, we get a error about (user_id,
-  device_id) not existing for our fake users returned via `/oauth2/introspect`
-  endpoint. I've been debugging it but I'm missing something. Once this gets
-  fixed, we would have proper framework for everything we need.
+For interception, there is a framework based on [customizations.md](https://github.com/vector-im/element-web/blob/develop/docs/customisations.md)
+

@@ -1,5 +1,5 @@
-import { mas, tokenUsers } from "../config.ts";
-import { proxy } from "../proxy.ts";
+import { MAS, tokenUsers } from "../../src/config.ts";
+import { proxy } from "../../src/utils/proxy.ts";
 
 export default async function (req: Request) {
   const body = await req.clone().formData();
@@ -11,5 +11,5 @@ export default async function (req: Request) {
     return Response.json(internalUser);
   }
 
-  return proxy(mas)(req);
+  return proxy(MAS)(req);
 }

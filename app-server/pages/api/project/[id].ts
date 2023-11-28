@@ -1,8 +1,8 @@
-import { houzzbotClient, kv } from "../../config.ts";
+import { houzzbotClient, kv } from "../../../src/config.ts";
 
 const elementDomain = "http://localhost:8080";
 
-const key = "projects-nov-9";
+const key = "projects-nov-28";
 
 export default async function getProjectRoom(
   _,
@@ -23,7 +23,11 @@ export default async function getProjectRoom(
     invite: ["@dineshdb:matrix.localdomain", "@dineshdb2:matrix.localdomain"],
   });
 
-  await kv.set([key, projectId], roomId);
+  await kv
+    .atomic()
+    .set([key, projectId], roomId)
+    .set([key, roomId], projectId)
+    .commit();
 
   return await joinAndReturn(roomId);
 }

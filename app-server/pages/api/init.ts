@@ -1,5 +1,5 @@
-import { tokenUsers } from "../config.ts";
-import { createDevice } from "../matrix-sdk.ts";
+import { tokenUsers } from "../../src/config.ts";
+import { createDevice } from "../../src/matrix.ts";
 
 export default async function init(_) {
   console.log("initializing users");
@@ -9,7 +9,7 @@ export default async function init(_) {
 
     await createDevice(
       `@${user.username}:matrix.localdomain`,
-      getDeviceId(user.scope as string)
+      getDeviceId(user.scope as string),
     );
   }
   return new Response(undefined, {

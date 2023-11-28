@@ -14,16 +14,17 @@ services:
     labels:
       - traefik.http.routers.mailtutan.rule=Host(`mail.localhost`)
       - traefik.http.services.mailtutan.loadbalancer.server.port=1080
-  traefik:
-    image: docker.io/traefik:latest
-    privileged: true
-    command:
-      - "--entrypoints.web.address=:80"
-      - "--providers.docker=true"
-    volumes:
-      - /run/podman/podman.sock:/var/run/docker.sock:z
-    ports:
-      - 80:80
+  ## enable this if you don't have traefik already setup
+  # traefik:
+  #   image: docker.io/traefik:latest
+  #   privileged: true
+  #   command:
+  #     - "--entrypoints.web.address=:80"
+  #     - "--providers.docker=true"
+  #   volumes:
+  #     - /run/podman/podman.sock:/var/run/docker.sock:z
+  #   ports:
+  #     - 80:80
   synapse:
     image: docker.io/matrixdotorg/synapse:develop
     environment:
@@ -52,8 +53,17 @@ services:
       - traefik.http.routers.mas.rule=Host(`mas.matrix.localhost`)
       - traefik.http.services.mas.loadbalancer.server.port=8080
   mas-proxy:
-    build:
-      context: ./oauth-proxy
+    image: docker.io/denoland/deno:1.38.0
+    working_dir: /app
+    command:
+      - deno
+      - run
+      - -A
+      - --watch
+      - --unstable
+      - main.ts
+    volumes:
+      - ./app-server:/app:z
     environment:
       - MAS=http://mas:8080
       - HOMESERVER_URL=http://matrix.localdomain
