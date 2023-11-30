@@ -1,5 +1,5 @@
 export async function getIntrospectionToken(token: string) {
-  const res = await fetch("http://localhost:8000/oauth2/introspect", {
+  const res = await fetch("http://auth.matrix.localhost/oauth2/introspect", {
     method: "POST",
     headers: {
       Authorization:
@@ -14,6 +14,6 @@ export async function getIntrospectionToken(token: string) {
   return json;
 }
 
-const res = await getIntrospectionToken("A");
+const res = await getIntrospectionToken("houzzbot");
 
 console.log({ res });

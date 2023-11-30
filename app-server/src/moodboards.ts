@@ -1,3 +1,5 @@
+import { moodBoards } from "./config.ts";
+
 export function renderMoodboards(
   roomId: string,
   eventId: string,
@@ -16,5 +18,13 @@ export function renderMoodboards(
 }
 
 export function renderMoodboard(moodboardId: string) {
-  return `Moodboard ${moodboardId}`;
+  const moodboard = moodBoards[moodboardId];
+  if (!moodboard) {
+    return ``;
+  }
+  return `
+  <h4><a href="${moodboard.url}">Moodboard ${moodboardId}: ${moodboard.title}</a></h4>
+  <img src="${moodboard.thumbnail}" width="400px" />
+
+  `;
 }

@@ -20,8 +20,12 @@ export default async function getProjectRoom(
     is_direct: false,
     name: `Project: ${projectId}`,
     preset: "trusted_private_chat",
+
     invite: ["@dineshdb:matrix.localdomain", "@dineshdb2:matrix.localdomain"],
   });
+
+  // background job
+  // todo: accept invites from each of the following users as a background job.
 
   await kv
     .atomic()

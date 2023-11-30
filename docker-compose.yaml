@@ -1,6 +1,6 @@
 volumes:
   postgres:
-  synapse:
+  synapse-data:
 services:
   postgres:
     image: docker.io/postgres
@@ -27,6 +27,7 @@ services:
   #     - 80:80
   synapse:
     image: docker.io/matrixdotorg/synapse:develop
+    user: "991:991"
     environment:
       - SYNAPSE_CONFIG_PATH=/config/homeserver.yaml
     depends_on:
@@ -35,7 +36,7 @@ services:
       - traefik.http.routers.synapse.rule=Host(`synapse.localhost`)
       - traefik.http.services.synapse.loadbalancer.server.port=8008
     volumes:
-      - synapse:/data:z
+      - synapse-data:/data:z
       - ./server/homeserver.yaml:/config/homeserver.yaml:z
       - ./server/matrix.localdomain.log.config:/config/matrix.localdomain.log.config:z
       - ./server/matrix.localdomain.signing.key:/config/matrix.localdomain.signing.key:z
@@ -52,9 +53,10 @@ services:
     labels:
       - traefik.http.routers.mas.rule=Host(`mas.matrix.localhost`)
       - traefik.http.services.mas.loadbalancer.server.port=8080
-  mas-proxy:
+  auth:
     image: docker.io/denoland/deno:1.38.0
     working_dir: /app
+    user: "deno:deno"
     command:
       - deno
       - run
@@ -63,7 +65,7 @@ services:
       - --unstable
       - main.ts
     volumes:
-      - ./app-server:/app:z
+      - ./app-server:/app:Z
     environment:
       - MAS=http://mas:8080
       - HOMESERVER_URL=http://matrix.localdomain

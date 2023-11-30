@@ -80,7 +80,22 @@ export const projects = {
 };
 
 export const moodBoards = {
-  "1": { title: "DArch Living Room", thumbnail: "" },
-  "2": { title: "DArch Dining Room", thumbnail: "" },
-  "3": { title: "Gym Hall", thumbnail: "" },
+  "1": {
+    title: "DArch Living Room",
+    url: "https://github.com/matrix-org/matrix-js-sdk",
+    thumbnail:
+      "https://dbhattarai.info.np/_astro/home-illustration.5a54143b_1ce4ca.webp",
+  },
+  "2": {
+    title: "DArch Dining Room",
+    url: "https://github.com/matrix-org/matrix-react-sdk",
+    thumbnail:
+      "https://dbhattarai.info.np/_astro/home-illustration.5a54143b_1ce4ca.webp",
+  },
+  "3": {
+    title: "Gym Hall",
+    url: "https://github.com/matrix-org/matrix-react-sdk",
+    thumbnail:
+      "https://dbhattarai.info.np/_astro/home-illustration.5a54143b_1ce4ca.webp",
+  },
 };

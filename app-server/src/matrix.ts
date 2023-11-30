@@ -47,11 +47,29 @@ export function editMessage(eventId: string, html: string) {
   return {
     msgtype: "m.text",
     body: " * helloff",
+
     "m.new_content": {
       msgtype: "m.text",
       formatted_body: html,
       format: "org.matrix.custom.html",
       "m.mentions": {},
+      "m.thumbnail": [
+        // optional
+        {
+          // A thumbnail is an m.file+m.image, or a small image
+          "m.file": {
+            url: "https://dbhattarai.info.np/_astro/home-illustration.5a54143b_1ce4ca.webp",
+            mimetype: "image/jpeg",
+            size: 400,
+
+            // "name" is optional in this scenario
+          },
+          "m.image_details": {
+            width: 160,
+            height: 120,
+          },
+        },
+      ],
     },
     "m.mentions": {},
     "m.relates_to": {
