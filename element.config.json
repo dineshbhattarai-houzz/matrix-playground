@@ -5,7 +5,7 @@
             "server_name": "matrix.localdomain"
         },
         "m.identity_server": {
-            "base_url": "http://auth.matrix.localhost"
+            "base_url": "http://auth.matrix.localdomain"
         }
     },
     "disable_custom_urls": false,

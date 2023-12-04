@@ -1,5 +1,5 @@
 export async function getIntrospectionToken(token: string) {
-  const res = await fetch("http://auth.matrix.localhost/oauth2/introspect", {
+  const res = await fetch("http://auth.matrix.localdomain/oauth2/introspect", {
     method: "POST",
     headers: {
       Authorization:

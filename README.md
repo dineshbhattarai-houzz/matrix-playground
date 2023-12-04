@@ -12,17 +12,12 @@ accordingly.
 
 ```bash
 # Optional. cmd for creating configuration file. One is already generated for you
-sudo podman run -v synapse:/data:z -e SYNAPSE_SERVER_NAME=matrix.localhost -e SYNAPSE_REPORT_STATS=yes docker.io/matrixdotorg/synapse:latest generate
-
+sudo podman run -v synapse:/data:z -e SYNAPSE_SERVER_NAME=matrix.localhost -e SYNAPSE_REPORT_STATS=yes docker.io/matrixdotorg synapse:latest generate
 
 # start the stack
+# note: synapse might fail to initialize data on first run due to postgres taking some time to initialize. Simply restart synapse after few seconds
 docker-compose up -d
 
-# you will need to sync oauth clients using. It contains a client used by synapse to make the api calls
-# on first run, wait while the database is migrated
-sudo podman run -v ./server/mas.yaml:/config.yaml:z --network=matrix_default ghcr.io/matrix-org/matrix-authentication-service:main --config=/config.yaml config sync
-
-# note: synapse might fail to initialize data on first run due to postgres taking some time to initialize. Simply restart synapse after few seconds
 ```
 
 ## Architecture
@@ -45,9 +40,9 @@ set. As a result, you need to set `/etc/hosts`
 ```
 # /etc/hosts
 
-# public ip of your local interface. synapse uses this domain to call introspection url
+# external ip of your local interface. synapse uses this domain to call introspection url
 # also, this needs to be available via browser for login
-192.168.18.109 matrix.localdomain
+192.168.18.109 matrix.localdomain auth.matrix.localdomain
 
 ```
 
@@ -72,14 +67,14 @@ Following things are being verified:
 
 ### Custom API
 
-API to get a room(`auth.matrix.localhost/api/project/[id]`): this endpoint would
+API to get a room(`auth.matrix.localdomain/api/project/[id]`): this endpoint would
 create a new matrix room or return preexisting room when a project id is
 provided. It would invite members to the room as well. Note: due to the
 architechture the members would need to accept the invitation to join. This
 should be doable by listening to invite events. ID is an opaque room id. This
 endpoint could live anywhere and has no reason to be inside this path.
 
-We implement `auth.matrix.localhost/oauth2/introspect` endpoint. This is just a
+We implement `auth.matrix.localdomain/oauth2/introspect` endpoint. This is just a
 proxy that returns early for some case and int other cases, it would just
 forward the request to `matrix-authentication-service`. This endpoint needs to
 live in this path since we are acting as middleman for the standard oauth

@@ -32,8 +32,8 @@ http:
   - 127.0.0.1/8
   - fd00::/8
   - ::1/128
-  public_base: http://auth.matrix.localhost/
-  issuer: http://auth.matrix.localhost/
+  public_base: http://auth.matrix.localdomain/
+  issuer: http://auth.matrix.localdomain/
 database:
   uri: postgres://mas:password@postgres/mas
   max_connections: 10
@@ -58,7 +58,7 @@ email:
   reply_to: '"Authentication Service" <root@localhost>'
   transport: smtp
   mode: plain
-  hostname: mailtutan
+  hostname: mail
   port: 1025
   # username: username
   #password: password

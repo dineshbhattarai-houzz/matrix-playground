@@ -22,7 +22,7 @@ router.all("/api/init", init);
 router.all("/oauth2/introspect", introspect);
 router.get("/api/project/:id", getProjectByProjectId);
 router.get("/bot/moodboard/:roomId/:eventId/:boardId", moodboard);
-router.get("/assets/*", serveFile);
+router.get("/public/*", serveFile);
 
 router.all("/*", proxy(MAS));
 
