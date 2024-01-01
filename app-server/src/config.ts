@@ -1,21 +1,13 @@
-import "https://deno.land/std@0.208.0/dotenv/load.ts";
-import { matrixSdk } from "../deps.ts";
+import "std/dotenv/load.ts";
 import { AutoJoinRoomClient } from "./matrix.ts";
+import { getMatrixClient } from "./matrix/client.ts";
 
 export const { MAS, HOMESERVER_URL, PORT } = Deno.env.toObject();
 
 export const kv = await Deno.openKv();
 
-export function getImpersonationClient(userId: string): matrixSdk.MatrixClient {
-  return matrixSdk.createClient({
-    baseUrl: HOMESERVER_URL,
-    userId: `@${userId}:matrix.localdomain`,
-    accessToken: userId,
-  });
-}
-
 export const houzzbotClient = AutoJoinRoomClient(
-  getImpersonationClient("houzzbot")
+  getMatrixClient("houzzbot", "houzzbot")
 );
 
 export const tokenUsers: Record<string, Record<string, unknown>> = {
@@ -29,18 +21,6 @@ export const tokenUsers: Record<string, Record<string, unknown>> = {
     iat: 1699373211,
     nbf: 1699373211,
     sub: "01HEKZZZCXTMRKJVY9DXRTGAJB",
-  },
-
-  dineshdb2: {
-    active: true,
-    scope:
-      "urn:matrix:org.matrix.msc2967.client:api:* urn:matrix:org.matrix.msc2967.client:device:nQGSKPNVNB",
-    client_id: "legacy",
-    username: "dineshdb2",
-    token_type: "access_token",
-    iat: 1699373211,
-    nbf: 1699373211,
-    sub: "01HEKZZZCXTMRKJVY9DXRTGAJD",
   },
 
   houzzbot: {

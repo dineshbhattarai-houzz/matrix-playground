@@ -1,29 +1,18 @@
-import init from "./pages/api/init.ts";
-import getProjectByProjectId from "./pages/api/project/[id].ts";
-import moodboard from "./pages/bot/moodboard.ts";
-import introspect from "./pages/oauth2/introspect.ts";
-import { MAS, PORT } from "./src/config.ts";
-import { proxy } from "./src/utils/proxy.ts";
-import { Router } from "./src/utils/router.ts";
-import { serveFile } from "./src/utils/serveFile.ts";
+import { getProvider } from "./src/oidc/provider.ts";
+import express from "express";
+import process from "node:process";
+import httpProxy from "express-http-proxy";
 
-const router = new Router();
-router.options("/*", () => {
-  return new Response(undefined, {
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "*",
-      "Access-Control-Allow-Methods": "*",
-    },
-  });
+const issuer = process.env.ISSUER ?? "http://localhost:3000"
+const port = process.env.PORT ?? 3000;
+
+export const oidcProvider = getProvider(issuer);
+
+const app = express();
+
+app.use("/oidc", oidcProvider.callback());
+app.use("/*", httpProxy("http://synapse:8008"));
+
+app.listen(port, () => {
+  console.log('oidc-provider listening on port 3000, check http://localhost:3000/oidc/.well-known/openid-configuration');
 });
-
-router.all("/api/init", init);
-router.all("/oauth2/introspect", introspect);
-router.get("/api/project/:id", getProjectByProjectId);
-router.get("/bot/moodboard/:roomId/:eventId/:boardId", moodboard);
-router.get("/public/*", serveFile);
-
-router.all("/*", proxy(MAS));
-
-Deno.serve({ port: PORT }, async (req: Request) => await router.route(req));

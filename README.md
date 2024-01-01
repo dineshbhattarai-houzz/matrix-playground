@@ -88,3 +88,29 @@ endpoint.
 
 For interception, there is a framework based on [customizations.md](https://github.com/vector-im/element-web/blob/develop/docs/customisations.md)
 
+
+## TODO
+- [x] exchange jukwaa header to an access token
+- [x] verify it works with synapse for normal flow
+- [x] combine oidc and companion app on same server
+- check if jwt access token can be enabled properly
+- Backchannel to generate an accesstoken for the bot account
+- Backchannel to generate accesstoken for auto-accepting the invites
+- idtoken and accesstoken
+
+## Exchanging jukwaa header for access-token
+Make a call at token endpoint with grant_type token-exchange. The endpoint will extract the jukwaa
+header and that will be used to authenticate the user. Right now, only userId and locale is set https://github.com/Houzz/jukwaa-packages/blob/bd5a2c52373be727d81096118784b9b5d3c9f5af/packages/request-proxy/src/jukwaaInfoFetcher.ts#L22
+
+We will need to update this to add more user info onto the header. #todo
+
+```
+const exchange = (url: string) => post(url, new URLSearchParams({
+  client_id: "0000000000000000000SYNAPSE",
+  grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
+  audience: "urn:houzz.com",
+  resource: "matrix"
+}));
+```
+
+For a running example, see lib.ts.

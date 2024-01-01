@@ -9,11 +9,6 @@ services:
       - /Users/dineshdb/src/github.com/dineshdb/matrix-playground/server/sql-init:/docker-entrypoint-initdb.d
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
-  mail:
-    image: docker.io/reachfive/fake-smtp-server
-    labels:
-      - traefik.http.routers.mail.rule=Host(`mail.localhost`)
-      - traefik.http.services.mail.loadbalancer.server.port=1080
   # enable this if you don't have traefik already setup
   traefik:
     image: docker.io/traefik:latest
@@ -32,7 +27,7 @@ services:
       - SYNAPSE_CONFIG_PATH=/config/homeserver.yaml
     depends_on:
       - postgres
-      - auth
+      - oidc-companion
     labels:
       - traefik.http.routers.synapse.rule=Host(`synapse.localhost`)
       - traefik.http.services.synapse.loadbalancer.server.port=8008
@@ -41,38 +36,10 @@ services:
       - /Users/dineshdb/src/github.com/dineshdb/matrix-playground/server/homeserver.yaml:/config/homeserver.yaml
       - /Users/dineshdb/src/github.com/dineshdb/matrix-playground/server/matrix.localdomain.log.config:/config/matrix.localdomain.log.config
       - /Users/dineshdb/src/github.com/dineshdb/matrix-playground/server/matrix.localdomain.signing.key:/config/matrix.localdomain.signing.key
-  mas-init:
-    image: ghcr.io/matrix-org/matrix-authentication-service:main
-    volumes:
-      - /Users/dineshdb/src/github.com/dineshdb/matrix-playground/server/mas.yaml:/config.yaml
-    depends_on:
-      - postgres
-      - mail
-    command:
-      - --config=/config.yaml
-      - config
-      - sync
-  mas:
-    image: ghcr.io/matrix-org/matrix-authentication-service:main
-    volumes:
-      - /Users/dineshdb/src/github.com/dineshdb/matrix-playground/server/mas.yaml:/config.yaml
-    depends_on:
-      - mas-init
-      - postgres
-      - mail
-    command:
-      - server
-      - --migrate
-      - --config=/config.yaml
-    labels:
-      - traefik.http.routers.mas.rule=Host(`mas.matrix.localhost`)
-      - traefik.http.services.mas.loadbalancer.server.port=8080
-  auth:
+  oidc-companion:
     image: docker.io/denoland/deno:1.38.0
     working_dir: /app
     user: "deno:deno"
-    depends_on:
-      - mas
     command:
       - deno
       - run
@@ -83,28 +50,26 @@ services:
     volumes:
       - /Users/dineshdb/src/github.com/dineshdb/matrix-playground/app-server:/app
     environment:
-      - MAS=http://mas:8080
-      - HOMESERVER_URL=http://matrix.localdomain
-      - PORT=8000
+      - PORT=3000
     labels:
-      - traefik.http.routers.auth.rule=Host(`auth.matrix.localdomain`)
-      - traefik.http.services.auth.loadbalancer.server.port=8000
-  bot:
-    image: docker.io/denoland/deno:1.38.0
-    working_dir: /app
-    user: "deno:deno"
-    command:
-      - deno
-      - run
-      - -A
-      - --watch
-      - --unstable
-      - bot.ts
-    volumes:
-      - /Users/dineshdb/src/github.com/dineshdb/matrix-playground/app-server:/app
-    environment:
-      - MAS=http://mas:8080
-      - HOMESERVER_URL=http://matrix.localdomain
+      - traefik.http.routers.auth.rule=Host(`matrix.localdomain`)
+      - traefik.http.services.auth.loadbalancer.server.port=3000
+  # bot:
+  #   image: docker.io/denoland/deno:1.38.0
+  #   working_dir: /app
+  #   user: "deno:deno"
+  #   command:
+  #     - deno
+  #     - run
+  #     - -A
+  #     - --watch
+  #     - --unstable
+  #     - bot.ts
+  #   volumes:
+  #     - /Users/dineshdb/src/github.com/dineshdb/matrix-playground/app-server:/app
+  #   environment:
+  #     - MAS=http://mas:8080
+  #     - HOMESERVER_URL=http://matrix.localdomain
   matrix:
     build:
       context: ./matrix-proxy

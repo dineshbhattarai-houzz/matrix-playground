@@ -1,5 +1,6 @@
 import { matrixSdk } from "../deps.ts";
-import { HOMESERVER_URL, getImpersonationClient } from "./config.ts";
+import { HOMESERVER_URL } from "./config.ts";
+import { getMatrixClient } from "./matrix/client.ts";
 
 export async function createDevice(userId: string, deviceId: string) {
   console.info(`creating new device ${deviceId} for user ${userId}`);
@@ -37,7 +38,7 @@ export function editUserMessage(
   eventId: string,
   html: string
 ) {
-  return getImpersonationClient(userId).sendMessage(
+  return getMatrixClient(userId, userId).sendMessage(
     roomId,
     editMessage(eventId, html)
   );
