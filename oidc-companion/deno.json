@@ -10,7 +10,5 @@
     "nanoid": "npm:/nanoid/",
     "express-http-proxy": "npm:/express-http-proxy/"
   },
-  "unstable": [
-    "sloppy-imports"
-  ]
+  "unstable": []
 }

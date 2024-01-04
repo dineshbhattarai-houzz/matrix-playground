@@ -3,7 +3,7 @@ import { moodBoards } from "./config.ts";
 export function renderMoodboards(
   roomId: string,
   eventId: string,
-  projectId: string
+  projectId: string,
 ) {
   return `
 	Here are the moodboards available. Select one of them

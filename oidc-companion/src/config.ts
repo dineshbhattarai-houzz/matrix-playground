@@ -7,7 +7,7 @@ export const { MAS, HOMESERVER_URL, PORT } = Deno.env.toObject();
 export const kv = await Deno.openKv();
 
 export const houzzbotClient = AutoJoinRoomClient(
-  getMatrixClient("houzzbot", "houzzbot")
+  getMatrixClient("houzzbot", "houzzbot"),
 );
 
 export const tokenUsers: Record<string, Record<string, unknown>> = {

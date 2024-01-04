@@ -15,7 +15,7 @@ async function handleCommand(roomId, event) {
       "dineshdb",
       event.room_id,
       event.event_id,
-      renderMoodboards(event.room_id, event.event_id, projectId)
+      renderMoodboards(event.room_id, event.event_id, projectId),
     );
   }
 
@@ -31,7 +31,7 @@ function showmoodboard(event) {
     "dineshdb",
     event.room_id,
     event.event_id,
-    renderMoodboard(id)
+    renderMoodboard(id),
   );
 }
 

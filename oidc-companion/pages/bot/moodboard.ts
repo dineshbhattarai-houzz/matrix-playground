@@ -3,7 +3,7 @@ import { renderMoodboard } from "../../src/moodboards.ts";
 
 export default async function moodboard(
   _,
-  { roomId, boardId, eventId }: Record<string, string>
+  { roomId, boardId, eventId }: Record<string, string>,
 ) {
   await editUserMessage("dineshdb", roomId, eventId, renderMoodboard(boardId));
   return new Response(
@@ -19,6 +19,6 @@ export default async function moodboard(
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "text/html",
       },
-    }
+    },
   );
 }

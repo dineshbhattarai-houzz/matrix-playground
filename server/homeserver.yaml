@@ -63,7 +63,7 @@ experimental_features:
     enabled: true
 
     # Synapse will call `{issuer}/.well-known/openid-configuration` to get the OIDC configuration
-    issuer: http://auth.matrix.localdomain/oidc
+    issuer: http://oidc:3000/oidc
 
     # Matches the `client_id` in the auth service config
     client_id: 0000000000000000000SYNAPSE
@@ -73,7 +73,7 @@ experimental_features:
     client_secret: "SomeRandomSecret"
 
     # Matches the `matrix.secret` in the auth service config
-    admin_token: "AA7ojdIPO1GCikEVF6d3BT15Q8hOe6hB"
+    # admin_token: "AA7ojdIPO1GCikEVF6d3BT15Q8hOe6hB"
 
     # URL to advertise to clients where users can self-manage their account
     account_management_url: "http://auth.matrix.localdomain/account"

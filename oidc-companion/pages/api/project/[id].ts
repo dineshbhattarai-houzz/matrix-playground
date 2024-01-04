@@ -6,7 +6,7 @@ const key = "projects-nov-28";
 
 export default async function getProjectRoom(
   _,
-  { id: projectId }: Record<string, string>
+  { id: projectId }: Record<string, string>,
 ) {
   console.log("creating new project");
   const { value: existingRoom } = await kv.get([key, projectId]);

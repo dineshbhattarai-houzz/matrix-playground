@@ -21,13 +21,13 @@ services:
     ports:
       - 80:80
   synapse:
-    image: docker.io/matrixdotorg/synapse:develop
+    image: docker.io/matrixdotorg/synapse:latest
     user: "991:991"
     environment:
       - SYNAPSE_CONFIG_PATH=/config/homeserver.yaml
     depends_on:
       - postgres
-      - oidc-companion
+      - oidc
     labels:
       - traefik.http.routers.synapse.rule=Host(`synapse.localhost`)
       - traefik.http.services.synapse.loadbalancer.server.port=8008
@@ -36,8 +36,8 @@ services:
       - /Users/dineshdb/src/github.com/dineshdb/matrix-playground/server/homeserver.yaml:/config/homeserver.yaml
       - /Users/dineshdb/src/github.com/dineshdb/matrix-playground/server/matrix.localdomain.log.config:/config/matrix.localdomain.log.config
       - /Users/dineshdb/src/github.com/dineshdb/matrix-playground/server/matrix.localdomain.signing.key:/config/matrix.localdomain.signing.key
-  oidc-companion:
-    image: docker.io/denoland/deno:1.38.0
+  oidc:
+    image: docker.io/denoland/deno:1.38.1
     working_dir: /app
     user: "deno:deno"
     command:
@@ -48,11 +48,11 @@ services:
       - --unstable
       - main.ts
     volumes:
-      - /Users/dineshdb/src/github.com/dineshdb/matrix-playground/app-server:/app
+      - /Users/dineshdb/src/github.com/dineshdb/matrix-playground/oidc-companion:/app:Z
     environment:
       - PORT=3000
     labels:
-      - traefik.http.routers.auth.rule=Host(`matrix.localdomain`)
+      - traefik.http.routers.auth.rule=Host(`auth.matrix.localhost`)
       - traefik.http.services.auth.loadbalancer.server.port=3000
   # bot:
   #   image: docker.io/denoland/deno:1.38.0
@@ -75,7 +75,7 @@ services:
       context: ./matrix-proxy
     depends_on:
       - synapse
-      - mas
+      - oidc
     labels:
-      - traefik.http.routers.matrix.rule=Host(`matrix.localdomain`)
+      - traefik.http.routers.matrix.rule=Host(`matrix.localhost`)
       - traefik.http.services.matrix.loadbalancer.server.port=80
