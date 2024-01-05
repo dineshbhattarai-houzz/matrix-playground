@@ -36,6 +36,10 @@ services:
       - /Users/dineshdb/src/github.com/dineshdb/matrix-playground/server/homeserver.yaml:/config/homeserver.yaml
       - /Users/dineshdb/src/github.com/dineshdb/matrix-playground/server/matrix.localdomain.log.config:/config/matrix.localdomain.log.config
       - /Users/dineshdb/src/github.com/dineshdb/matrix-playground/server/matrix.localdomain.signing.key:/config/matrix.localdomain.signing.key
+  redis:
+    image: docker.io/redis
+    ports:
+      - 6379:6379
   oidc:
     image: docker.io/denoland/deno:1.38.1
     working_dir: /app
@@ -48,11 +52,13 @@ services:
       - --unstable
       - main.ts
     volumes:
-      - /Users/dineshdb/src/github.com/dineshdb/matrix-playground/oidc-companion:/app:Z
+      - /Users/dineshdb/src/github.com/dineshdb/matrix-playground/oidc-companion:/app
     environment:
       - PORT=3000
+      - ADMIN_USERNAME=admin
+      - HOMESERVER_URL=http://synapse:8008
     labels:
-      - traefik.http.routers.auth.rule=Host(`auth.matrix.localhost`)
+      - traefik.http.routers.auth.rule=Host(`auth.matrix.localdomain`)
       - traefik.http.services.auth.loadbalancer.server.port=3000
   # bot:
   #   image: docker.io/denoland/deno:1.38.0
@@ -77,5 +83,5 @@ services:
       - synapse
       - oidc
     labels:
-      - traefik.http.routers.matrix.rule=Host(`matrix.localhost`)
+      - traefik.http.routers.matrix.rule=Host(`matrix.localdomain`)
       - traefik.http.services.matrix.loadbalancer.server.port=80

@@ -1,5 +1,3 @@
-import { gty } from "./tokenExchange.ts";
-
 type OpenIdConfiguration = {
   token_endpoint: string;
   introspection_endpoint: string;
@@ -21,10 +19,11 @@ export async function getOpenIdClient(
   return new OpenIdClient(config, clientId, clientSecret);
 }
 
-type ExchangeTokenResponse = {
+export type ExchangeTokenResponse = {
   access_token: string;
   refresh_token: string;
   scope: string;
+  expires_in: number;
   token_type: string;
 };
 
@@ -69,9 +68,9 @@ export class OpenIdClient {
       },
       body: new URLSearchParams({
         client_id: this.#clientId,
-        grant_type: gty,
+        grant_type: "urn:ietf:params:oauth:grant-type:jukwaa-token-exchange",
         audience: "urn:houzz.com",
-        device_id: deviceId ?? "abc",
+        device_id: deviceId ?? "",
       }),
     });
     return await res.json();

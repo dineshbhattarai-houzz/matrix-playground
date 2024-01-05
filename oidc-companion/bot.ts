@@ -47,6 +47,6 @@ export default function main() {
 }
 
 if (import.meta.main) {
-  console.log("starting");
+  console.info("starting");
   main();
 }

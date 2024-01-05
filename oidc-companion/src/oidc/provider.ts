@@ -1,4 +1,4 @@
-import Provider from "oidc-provider";
+import Provider,  { errors } from "oidc-provider";
 
 import { client } from "./config.ts";
 import {
@@ -7,8 +7,43 @@ import {
   handler,
   parameters,
 } from "./tokenExchange.ts";
+const corsProp = 'urn:custom:client:allowed-cors-origins';
+const isOrigin = (value) => {
+  if (typeof value !== 'string') {
+    return false;
+  }
+  try {
+    const { origin } = new URL(value);
+    // Origin: <scheme> "://" <hostname> [ ":" <port> ]
+    return value === origin;
+  } catch (err) {
+    return false;
+  }
+}
 
 export const OIDCConfiguration = {
+  extraClientMetadata: {
+    properties: [corsProp],
+    validator(ctx, key, value, metadata) {
+      if (key === corsProp) {
+        // set default (no CORS)
+        if (value === undefined) {
+          metadata[corsProp] = [];
+          return;
+        }
+        // validate an array of Origin strings
+        if (!Array.isArray(value) || !value.every(isOrigin)) {
+          throw new errors.InvalidClientMetadata(`${corsProp} must be an array of origins`);
+        }
+      }
+    },
+  },
+  clientBasedCORS(ctx, origin, client) {
+    // ctx.oidc.route can be used to exclude endpoints from this behaviour, in that case just return
+    // true to always allow CORS on them, false to deny
+    // you may also allow some known internal origins if you want to
+    return client[corsProp].includes(origin);
+  },
   async findAccount(ctx, id, token) {
     return {
       accountId: id,
@@ -35,10 +70,11 @@ export const OIDCConfiguration = {
     {
       client_id: client.id,
       client_secret: client.secret,
-      redirect_uris: ["http://lvh.me:8080/cb"],
+      redirect_uris: ["http://localhost:8080/cb"],
       grant_types: ["authorization_code", "refresh_token", gty],
       // token_endpoint_auth_method: "none",
       application_type: "web",
+      [corsProp]: ["http://localhost:8080"]
     },
   ],
   jwks: {

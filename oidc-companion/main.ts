@@ -11,8 +11,8 @@ if (import.meta.main) {
   app.use("/oidc", oidcProvider.callback());
 
   app.listen(port, () => {
-    console.log(
-      "oidc-provider listening on port 3000, check http://localhost:3000/oidc/.well-known/openid-configuration",
+    console.info(
+      `oidc-provider listening on port ${port}, check http://localhost:${port}/oidc/.well-known/openid-configuration`,
     );
   });
 }

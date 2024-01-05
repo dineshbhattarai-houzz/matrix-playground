@@ -1,5 +1,7 @@
 import { matrixSdk } from "../../deps.ts";
-const HOMESERVER_URL = Deno.env.get("HOMESERVER_URL");
+import process from "node:process";
+
+const HOMESERVER_URL = process.env.HOMESERVER_URL;
 
 export function getMatrixClient(
   userId: string,
@@ -12,10 +14,9 @@ export function getMatrixClient(
   });
 }
 
-export async function createDevice(accessToken: string, userId: string, deviceId: string) {
-    console.info(`creating new device ${deviceId} for user ${userId}`);
+export async function createDevice(accessToken: string, fullUserId: string, deviceId: string) {
     const res = await fetch(
-      `${HOMESERVER_URL}/_synapse/admin/v2/users/${userId}/devices`,
+      `${HOMESERVER_URL}/_synapse/admin/v2/users/${fullUserId}/devices`,
       {
         method: "POST",
         body: JSON.stringify({
@@ -26,8 +27,9 @@ export async function createDevice(accessToken: string, userId: string, deviceId
         },
       },
     );
-  
+
     if (res.status >= 400) {
       throw new Error(await res.text());
     }
+    return res.status;
   }
