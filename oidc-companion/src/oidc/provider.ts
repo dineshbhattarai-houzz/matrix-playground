@@ -1,12 +1,12 @@
 import Provider,  { errors } from "oidc-provider";
 
-import { client } from "./config.ts";
+import { client } from "./config.js";
 import {
   allowedDuplicateParameters,
   gty,
   handler,
   parameters,
-} from "./tokenExchange.ts";
+} from "./tokenExchange.js";
 const corsProp = 'urn:custom:client:allowed-cors-origins';
 const isOrigin = (value) => {
   if (typeof value !== 'string') {
@@ -24,7 +24,7 @@ const isOrigin = (value) => {
 export const OIDCConfiguration = {
   extraClientMetadata: {
     properties: [corsProp],
-    validator(ctx, key, value, metadata) {
+    validator(_ctx, key, value, metadata) {
       if (key === corsProp) {
         // set default (no CORS)
         if (value === undefined) {
@@ -38,21 +38,21 @@ export const OIDCConfiguration = {
       }
     },
   },
-  clientBasedCORS(ctx, origin, client) {
+  clientBasedCORS(_ctx, origin, client) {
     // ctx.oidc.route can be used to exclude endpoints from this behaviour, in that case just return
     // true to always allow CORS on them, false to deny
     // you may also allow some known internal origins if you want to
     return client[corsProp].includes(origin);
   },
-  async findAccount(ctx, id, token) {
+  async findAccount(_ctx, id: string, _token) {
     return {
       accountId: id,
-      async claims(_use: string, scope: string) {
+      async claims(_use: string, _scope: string) {
         return { sub: id };
       },
     };
   },
-  async extraTokenClaims(ctx, token) {
+  async extraTokenClaims(_ctx, token) {
     return {
       'username': token.accountId,
     };
@@ -73,7 +73,6 @@ export const OIDCConfiguration = {
       redirect_uris: ["http://localhost:8080/cb"],
       grant_types: ["authorization_code", "refresh_token", gty],
       // token_endpoint_auth_method: "none",
-      application_type: "web",
       [corsProp]: ["http://localhost:8080"]
     },
   ],

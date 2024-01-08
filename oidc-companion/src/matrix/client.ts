@@ -1,4 +1,4 @@
-import { matrixSdk } from "../../deps.ts";
+import * as matrixSdk from "matrix-js-sdk";
 import process from "node:process";
 
 const HOMESERVER_URL = process.env.HOMESERVER_URL;

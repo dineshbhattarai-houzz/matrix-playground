@@ -1,10 +1,10 @@
-import { matrixSdk } from "../deps.ts";
-import { getMatrixClient } from "./matrix/client.ts";
+import * as matrixSdk from "matrix-js-sdk";
+import { getMatrixClient } from "./matrix/client.js";
 
 export function AutoJoinRoomClient(
   client: matrixSdk.MatrixClient,
 ): matrixSdk.MatrixClient {
-  client.on("room.invite", (roomId: string, _inviteEvent: any) => {
+  client.on("room.invite" as matrixSdk.EmittedEvents, (roomId: string, _inviteEvent: any) => {
     return client.joinRoom(roomId);
   });
 

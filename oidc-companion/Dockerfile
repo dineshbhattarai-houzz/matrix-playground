@@ -1,9 +1,16 @@
-FROM docker.io/denoland/deno:1.38.0
-EXPOSE 1993
-WORKDIR /app
-USER deno
-COPY deno.lock deps.ts .
-RUN deno cache --lock=deno.lock deps.ts
+FROM docker.io/node as builder
+WORKDIR /usr/src/app
+COPY package.json package-lock.json ./
+RUN npm ci
 COPY . .
-RUN deno cache main.ts
-CMD ["run", "-A", "--unstable", "main.ts"]
+RUN npm run build
+
+FROM docker.io/node:slim
+ENV NODE_ENV production
+WORKDIR /usr/src/app
+COPY package.json package-lock.json ./
+RUN npm ci --only=production
+COPY --from=builder /usr/src/app/dist ./dist
+EXPOSE 3000
+USER node
+CMD [ "node", "dist/index.js" ]

@@ -73,10 +73,10 @@ export class OpenIdClient {
         device_id: deviceId ?? "",
       }),
     });
-    return await res.json();
+    return (await res.json()) as ExchangeTokenResponse;
   }
 
-  async refresh(token: ExchangeTokenResponse) {
+  async refresh(token: ExchangeTokenResponse) : Promise<ExchangeTokenResponse> {
     const res = await fetch(this.#config.token_endpoint, {
       method: "POST",
       headers: {
@@ -89,7 +89,7 @@ export class OpenIdClient {
         scope: token.scope,
       }),
     });
-    return await res.json();
+    return (await res.json()) as ExchangeTokenResponse;
   }
 }
 
@@ -99,5 +99,5 @@ export async function getOpenIdConfiguration(
   const res = await fetch(
     `${baseUrl}/.well-known/openid-configuration`.replace("//", "/"),
   );
-  return await res.json();
+  return (await res.json())as OpenIdConfiguration;
 }

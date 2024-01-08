@@ -1,6 +1,6 @@
 
-import { client } from "../../src/oidc/config.ts";
-import { ExchangeTokenResponse, getOpenIdClient } from "./client.ts";
+import { client } from "../../src/oidc/config.js";
+import { ExchangeTokenResponse, getOpenIdClient } from "./client.js";
 import process from "node:process";
 
 const PORT = process.env.PORT;

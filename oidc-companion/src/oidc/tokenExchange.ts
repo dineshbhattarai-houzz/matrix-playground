@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 import process from "node:process";
-import { getAdminTokensProvider } from "./adminToken.ts";
-import { createDevice } from "../matrix/client.ts";
+import { getAdminTokensProvider } from "./adminToken.js";
+import { createDevice } from "../matrix/client.js";
 
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
 
@@ -21,8 +21,6 @@ export async function handler(ctx, next) {
   const {
     RefreshToken,
     AccessToken,
-    IdToken,
-    InvalidGrant,
     Grant,
   } = ctx.oidc.provider;
   const headerUserInfo = ctx.req.get("jukwaa-infos");
