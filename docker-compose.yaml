@@ -41,18 +41,7 @@ services:
     ports:
       - 6379:6379
   oidc:
-    image: docker.io/denoland/deno:1.38.1
-    working_dir: /app
-    user: "deno:deno"
-    command:
-      - deno
-      - run
-      - -A
-      - --watch
-      - --unstable
-      - main.ts
-    volumes:
-      - /Users/dineshdb/src/github.com/dineshdb/matrix-playground/oidc-companion:/app
+    build: oidc-companion
     environment:
       - PORT=3000
       - ADMIN_USERNAME=admin
