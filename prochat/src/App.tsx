@@ -1,11 +1,11 @@
-import React, { useContext, useState, useEffect } from 'react';
+import  { useContext } from 'react';
 import './App.css';
 import { MatrixContext, useMatrix } from './matrix';
 
 
 function App() {
   const { matrixClient } = useMatrix();
-  if (!matrixClient) {
+  if (!matrixClient || matrixClient?.getRooms().length ===0) {
     return <></>;
   }
 

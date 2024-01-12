@@ -2,7 +2,7 @@
 import { createContext, useEffect, useState } from 'react';
 import * as matrixSdk from "matrix-js-sdk";
 
-const tokenEndpoint = "http://auth.matrix.localdomain/oidc/token";
+const tokenEndpoint = "https://teamchat.eks-saas.staging.houzz.net/oidc/token";
 
 type ExchangeTokenResponse = {
   access_token: string;
@@ -13,13 +13,13 @@ type ExchangeTokenResponse = {
 };
 
 export const MatrixContext = createContext(matrixSdk.createClient({
-  baseUrl: "http://matrix.localdomain",
+  baseUrl: "https://teamchat.eks-saas.staging.houzz.net",
 }))
 
 const mockUserInfo = {
   user: {
     userId: "dineshdb",
-    username: "dineshdb"
+    username: "@dineshdb:matrix.localdomain"
   },
 };
 
@@ -36,7 +36,9 @@ async function refresh(token: ExchangeTokenResponse) {
       scope: token.scope,
     }),
   });
-  return await res.json();
+  const json = await res.json();
+  console.info("refreshed user tokens", json)
+  return json;
 }
 
 async function getUserToken(deviceId: string): Promise<ExchangeTokenResponse> {
@@ -53,7 +55,9 @@ async function getUserToken(deviceId: string): Promise<ExchangeTokenResponse> {
       device_id: deviceId,
     })
   });
-  return await res.json()
+  const json = await res.json();
+  console.info("fetched user tokens", json)
+  return json;
 }
 
 const matrix_device_id = "matrix_device_id"
@@ -86,8 +90,8 @@ export function useMatrix() {
 
   async function createClient(userTokens: ExchangeTokenResponse){
     const client = matrixSdk.createClient({
-      baseUrl: "http://matrix.localdomain",
-      userId: "@dineshdb:matrix.localdomain",
+      baseUrl: "https://teamchat.eks-saas.staging.houzz.net",
+      userId: `@dineshdb:teamchat.eks-saas.staging.houzz.net`,
       accessToken: userTokens.access_token,
     });
     client.on('sync', async function (state: string) {
