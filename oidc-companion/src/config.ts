@@ -79,3 +79,22 @@
 //       "https://dbhattarai.info.np/_astro/home-illustration.5a54143b_1ce4ca.webp",
 //   },
 // };
+
+import process from "node:process";
+
+export const PORT = process.env.PORT ?? 3000;
+export const OIDC_ISSUER = process.env.OIDC_ISSUER ?? "http://localhost:3000";
+export const MATRIX_SERVER_NAME = process.env.MATRIX_SERVER_NAME;
+export const MATRIX_HOMESERVER_URL = process.env.MATRIX_HOMESERVER_URL;
+export const MATRIX_ADMIN_USERNAME = process.env.MATRIX_ADMIN_USERNAME ?? "admin";
+export const MATRIX_SKIP_DEVICE_CREATION = process.env.MATRIX_SKIP_DEVICE_CREATION;
+
+require("MATRIX_SERVER_NAME");
+require("MATRIX_HOMESERVER_URL");
+
+function require(envName: string){
+    if(!process.env[envName]) {
+        console.error(`Environment variable '${envName}' is required.`)
+        process.exit(1);
+    }
+}

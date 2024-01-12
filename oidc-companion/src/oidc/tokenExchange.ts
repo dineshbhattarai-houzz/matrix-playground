@@ -1,9 +1,7 @@
 import { nanoid } from "nanoid";
-import process from "node:process";
 import { getAdminTokensProvider } from "./adminToken.js";
 import { createDevice } from "../matrix/client.js";
-
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
+import { MATRIX_ADMIN_USERNAME, MATRIX_SERVER_NAME } from "../config.js";
 
 const adminTokensProvider = getAdminTokensProvider();
 
@@ -29,22 +27,20 @@ export async function handler(ctx, next) {
   }
 
   const userInfo = JSON.parse(headerUserInfo);
-  if(!userInfo.user.userId) {
+  if (!userInfo.user.userId) {
     ctx.throw(401, "unauthorized", "request is not authorized");
   }
 
   const userId = userInfo.user.userId;
   const deviceId = ctx.oidc.params.device_id ?? nanoid(6);
-  const isAdmin = userId === ADMIN_USERNAME;
+  const isAdmin = userId === MATRIX_ADMIN_USERNAME;
   const scope =
-    `${isAdmin ? "urn:synapse:admin:*" : ""} urn:matrix:org.matrix.msc2967.client:api:* urn:matrix:org.matrix.msc2967.client:device:${
-      deviceId
+    `${isAdmin ? "urn:synapse:admin:*" : ""} urn:matrix:org.matrix.msc2967.client:api:* urn:matrix:org.matrix.msc2967.client:device:${deviceId
     }`;
 
-  if(!isAdmin){
+  if (!isAdmin) {
     const adminTokens = await adminTokensProvider.get();
-    const status = await createDevice(adminTokens.access_token, `@${userId}:matrix.localdomain`, deviceId);
-    console.info('device created', {userId, deviceId, status});
+    await createDevice(adminTokens.access_token, `@${userId}:${MATRIX_SERVER_NAME}`, deviceId);
   }
 
   const grant = new Grant({
@@ -82,7 +78,7 @@ export async function handler(ctx, next) {
     sessionUid: at.sid,
     sid: at.sid,
   });
-  
+
   ctx.oidc.entity("AccessToken", at);
   const accessToken = await at.save();
 

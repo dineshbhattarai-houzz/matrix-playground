@@ -1,35 +1,37 @@
 import * as matrixSdk from "matrix-js-sdk";
-import process from "node:process";
-
-const HOMESERVER_URL = process.env.HOMESERVER_URL;
+import fetch from 'cross-fetch';
+import { MATRIX_SKIP_DEVICE_CREATION, MATRIX_HOMESERVER_URL, MATRIX_SERVER_NAME } from "../config.js";
 
 export function getMatrixClient(
   userId: string,
   accessToken: string,
 ): matrixSdk.MatrixClient {
   return matrixSdk.createClient({
-    baseUrl: HOMESERVER_URL,
-    userId: `@${userId}:matrix.localdomain`,
+    baseUrl: MATRIX_HOMESERVER_URL,
+    userId: `@${userId}:${MATRIX_SERVER_NAME}`,
     accessToken,
   });
 }
 
 export async function createDevice(accessToken: string, fullUserId: string, deviceId: string) {
-    const res = await fetch(
-      `${HOMESERVER_URL}/_synapse/admin/v2/users/${fullUserId}/devices`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          device_id: deviceId,
-        }),
-        headers: {
-          Authorization: "Bearer " + accessToken,
-        },
-      },
-    );
-
-    if (res.status >= 400) {
-      throw new Error(await res.text());
-    }
-    return res.status;
+  if(MATRIX_SKIP_DEVICE_CREATION){
+    return;
   }
+  const res = await fetch(
+    `${MATRIX_HOMESERVER_URL}/_synapse/admin/v2/users/${fullUserId}/devices`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        device_id: deviceId,
+      }),
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    },
+  );
+
+  if (res.status !== 201) {
+    throw new Error(await res.text());
+  }
+  console.info('device created', { userId: fullUserId, deviceId});
+}

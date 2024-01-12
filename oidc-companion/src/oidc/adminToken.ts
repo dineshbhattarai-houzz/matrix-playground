@@ -1,10 +1,7 @@
 
 import { client } from "../../src/oidc/config.js";
+import { MATRIX_ADMIN_USERNAME, PORT } from "../config.js";
 import { ExchangeTokenResponse, getOpenIdClient } from "./client.js";
-import process from "node:process";
-
-const PORT = process.env.PORT;
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME
 
 export function getAdminTokensProvider(){
   let adminTokens: ExchangeTokenResponse | undefined = undefined;
@@ -22,13 +19,14 @@ export function getAdminTokensProvider(){
       
         const mockUserInfo = {
           user: {
-            userId: ADMIN_USERNAME,
-            username: ADMIN_USERNAME,
+            userId: MATRIX_ADMIN_USERNAME,
+            username: MATRIX_ADMIN_USERNAME,
           },
         };
         
         // get and update accesstoken
         adminTokens = await openIdClient.exchange(mockUserInfo, "admin-job");
+        console.info('acquired admin access tokens');
         setInterval(async() => {
             const newToken = await openIdClient.refresh(adminTokens!);
             adminTokens = newToken;

@@ -1,3 +1,5 @@
+import fetch from 'cross-fetch';
+
 type OpenIdConfiguration = {
   token_endpoint: string;
   introspection_endpoint: string;
@@ -73,7 +75,8 @@ export class OpenIdClient {
         device_id: deviceId ?? "",
       }),
     });
-    return (await res.json()) as ExchangeTokenResponse;
+    const json = await res.json();
+    return json as ExchangeTokenResponse;
   }
 
   async refresh(token: ExchangeTokenResponse) : Promise<ExchangeTokenResponse> {
@@ -99,5 +102,6 @@ export async function getOpenIdConfiguration(
   const res = await fetch(
     `${baseUrl}/.well-known/openid-configuration`.replace("//", "/"),
   );
-  return (await res.json())as OpenIdConfiguration;
+  const json = await res.json();
+  return json as OpenIdConfiguration;
 }

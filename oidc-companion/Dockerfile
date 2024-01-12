@@ -5,7 +5,7 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-FROM docker.io/node:slim
+FROM docker.io/node:lts-slim
 ENV NODE_ENV production
 WORKDIR /usr/src/app
 COPY package.json package-lock.json ./
