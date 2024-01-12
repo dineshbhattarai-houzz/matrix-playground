@@ -1,6 +1,6 @@
 
 import { client } from "../../src/oidc/config.js";
-import { MATRIX_ADMIN_USERNAME, PORT } from "../config.js";
+import { MATRIX_ADMIN_USERNAME, MATRIX_SERVER_NAME, PORT } from "../config.js";
 import { ExchangeTokenResponse, getOpenIdClient } from "./client.js";
 
 export function getAdminTokensProvider(){
@@ -20,7 +20,7 @@ export function getAdminTokensProvider(){
         const mockUserInfo = {
           user: {
             userId: MATRIX_ADMIN_USERNAME,
-            username: MATRIX_ADMIN_USERNAME,
+            username: `@${MATRIX_ADMIN_USERNAME}:${MATRIX_SERVER_NAME}`,
           },
         };
         

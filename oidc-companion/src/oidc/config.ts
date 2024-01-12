@@ -1,5 +1,6 @@
 import { errors } from "oidc-provider";
 import { gty } from "./tokenExchange.js";
+import { MATRIX_SERVER_NAME } from "../config.js";
 export const client = {
   id: "0000000000000000000SYNAPSE",
   secret: "SomeRandomSecret",
@@ -52,7 +53,7 @@ export const OIDCConfiguration = {
   },
   async extraTokenClaims(_ctx, token) {
     return {
-      'username': token.accountId,
+      'username': `@${token.accountId}:${MATRIX_SERVER_NAME}`,
     };
   },
 

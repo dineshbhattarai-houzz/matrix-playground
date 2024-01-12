@@ -30,13 +30,14 @@ export async function handler(ctx, next) {
 
   const userId = userInfo.user.userId;
   const deviceId = ctx.oidc.params.device_id ?? nanoid(6);
+  const fullUserId = `@${userId}:${MATRIX_SERVER_NAME}`;
   const isAdmin = userId === MATRIX_ADMIN_USERNAME;
   const scope =
     `${isAdmin ? "urn:synapse:admin:*" : ""} urn:matrix:org.matrix.msc2967.client:api:* urn:matrix:org.matrix.msc2967.client:device:${deviceId
     }`;
 
   if (!isAdmin) {
-    enqueueCreateDevice(`@${userId}:${MATRIX_SERVER_NAME}`, deviceId)
+    enqueueCreateDevice(fullUserId, deviceId)
   }
 
   const grant = new Grant({
@@ -97,7 +98,7 @@ export async function handler(ctx, next) {
     refresh_token: refreshToken,
     scope: at.scope,
     userId: userInfo.user.userId,
-    username: userInfo.user.userId,
+    username: fullUserId,
     token_type: at.tokenType,
   };
   await next();
