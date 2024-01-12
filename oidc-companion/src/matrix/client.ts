@@ -31,7 +31,9 @@ export async function createDevice(accessToken: string, fullUserId: string, devi
   );
 
   if (res.status !== 201) {
-    throw new Error(await res.text());
+    const error = await res.text();
+    console.error('error creating device', {error, fullUserId})
+    throw new Error(error);
   }
   console.info('device created', { userId: fullUserId, deviceId});
 }

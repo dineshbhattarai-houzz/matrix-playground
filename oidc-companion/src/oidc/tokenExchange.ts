@@ -1,9 +1,6 @@
 import { nanoid } from "nanoid";
-import { getAdminTokensProvider } from "./adminToken.js";
-import { createDevice } from "../matrix/client.js";
 import { MATRIX_ADMIN_USERNAME, MATRIX_SERVER_NAME } from "../config.js";
-
-const adminTokensProvider = getAdminTokensProvider();
+import { enqueueCreateDevice } from "./createDeviceJob.js";
 
 export const gty = "urn:ietf:params:oauth:grant-type:jukwaa-token-exchange";
 
@@ -39,8 +36,7 @@ export async function handler(ctx, next) {
     }`;
 
   if (!isAdmin) {
-    const adminTokens = await adminTokensProvider.get();
-    await createDevice(adminTokens.access_token, `@${userId}:${MATRIX_SERVER_NAME}`, deviceId);
+    enqueueCreateDevice(`@${userId}:${MATRIX_SERVER_NAME}`, deviceId)
   }
 
   const grant = new Grant({
