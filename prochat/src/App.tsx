@@ -5,8 +5,12 @@ import { MatrixContext, useMatrix } from './matrix';
 
 function App() {
   const { matrixClient } = useMatrix();
-  if (!matrixClient || matrixClient?.getRooms().length ===0) {
+  if (!matrixClient) {
     return <></>;
+  }
+
+  if(matrixClient.getRooms().length === 0){
+    return <div>User does not have any rooms.</div>
   }
 
   return (
