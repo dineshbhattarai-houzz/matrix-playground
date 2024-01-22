@@ -2,21 +2,28 @@ import {useContext, useEffect, useState} from 'react';
 import './App.css';
 import { MatrixContext, useMatrix } from './matrix';
 
-function ProjectChat({ projectId, teamId, userId }: LoginParams) {
-  const { matrixClient, helperClient } = useMatrix({userId, teamId});
+function ProjectChat({ projectId, userId }: LoginParams) {
+  const { matrixClient, helperClient } = useMatrix({user: {userId}});
   const [roomId, setRoomId] = useState<string | null>(null)
-  if (!matrixClient) {
-    return <></>;
-  }
 
   useEffect(() => {
+    if(!matrixClient){
+      return;
+    }
     async function init()
     {
-      setRoomId(await helperClient.getRoomId(projectId))
+      const roomId = await helperClient.getRoomId(projectId);
+      if(roomId){
+        setRoomId(roomId);
+      }
     }
 
     init();
-  }, []);
+  }, [matrixClient]);
+
+  if (!matrixClient) {
+    return <></>;
+  }
 
   if(matrixClient.getRooms().length === 0){
     return <div>User does not have any rooms.</div>
@@ -38,18 +45,17 @@ function ProjectChat({ projectId, teamId, userId }: LoginParams) {
   );
 }
 
-type LoginParams = { userId: number, projectId: number, teamId: number };
+type LoginParams = { userId: string, projectId: number, teamId: number };
 
 function Login({onLogin}: {onLogin: (login: LoginParams) => void}) {
-  const [userId, setUserId] = useState(1234);
-  const [projectId, setProjectId] = useState(9876);
+  const [userId, setUserId] = useState('231');
+  const [projectId, setProjectId] = useState(345);
   const [teamId, setTeamId] = useState(456);
-
 
   return <form className="login-screen">
       <label>
         <span>User Id:</span>
-        <input type="text" value={userId} onChange={e => setUserId(Number(e.currentTarget.value))} />
+        <input type="text" value={userId} onChange={e => setUserId(Number(e.currentTarget.value).toFixed(0))} />
       </label>
     <label>
       <span>Team Id:</span>

@@ -41,7 +41,7 @@ services:
     ports:
       - 6379:6379
   oidc:
-    build: oidc-companion
+    image: oidc
     environment:
       - PORT=3000
       - MATRIX_ADMIN_USERNAME=admin
