@@ -88,19 +88,15 @@ export class HelperClient {
     const headers = {
       "jukwaa-infos": JSON.stringify({ user: this.jukwaaInfos }),
     };
-    const params = new URLSearchParams({
-      projectId: "" + projectId,
-    });
     const response = await fetch(
-      helperEndpoint + "getOrCreateProjectRoom?" + params.toString(),
+      helperEndpoint + "getOrCreateProjectRoom/" + projectId,
       { headers },
     );
     if (!response.ok) {
       throw new Error("Failed to get room");
     }
     const payload = await response.json();
-
-    return payload.roomId;
+    return payload.room_id;
   }
 }
 

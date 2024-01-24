@@ -12,7 +12,6 @@ function ProjectChat(loginParams: LoginParams) {
     }
     async function init() {
       const helper = new HelperClient(loginParams);
-      console.log("Getting room for project " + loginParams.projectId);
       const roomId = await helper.getRoomId(loginParams.projectId);
       setRoomId(roomId);
     }
@@ -48,9 +47,9 @@ function ProjectChat(loginParams: LoginParams) {
 type LoginParams = { userId: string; projectId: number; teamId: number };
 
 function Login({ onLogin }: { onLogin: (login: LoginParams) => void }) {
-  const [userId, setUserId] = useState(123);
-  const [projectId, setProjectId] = useState(345);
-  const [teamId, setTeamId] = useState(456);
+  const [userId, setUserId] = useState(111);
+  const [projectId, setProjectId] = useState(111);
+  const [teamId, setTeamId] = useState(111);
 
   return (
     <form className="login-screen">
