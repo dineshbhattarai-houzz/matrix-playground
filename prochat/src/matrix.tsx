@@ -4,7 +4,7 @@ import { ClientEvent } from "matrix-js-sdk";
 
 const tokenEndpoint = "/prochat/oidc/token";
 const helperEndpoint = "/prochat/helper/";
-const serverName = `teamchat.eks-saas.staging.houzz.net`;
+
 type ExchangeTokenResponse = {
   access_token: string;
   refresh_token: string;
@@ -75,7 +75,7 @@ function getDeviceID() {
   return newId;
 }
 
-type JukwaaInfos = { userId: number; teamId: number };
+type JukwaaInfos = { userId: string; teamId: number };
 
 export class HelperClient {
   private jukwaaInfos: JukwaaInfos;

@@ -21,11 +21,9 @@ function ProjectChat(loginParams: LoginParams) {
   }, [matrixClient]);
 
   if (!matrixClient) {
-    debugger;
     return <></>;
   }
 
-  debugger;
   if (matrixClient.getRooms().length === 0) {
     return <div>User does not have any rooms.</div>;
   }
@@ -35,7 +33,6 @@ function ProjectChat(loginParams: LoginParams) {
   }
 
   const room = matrixClient.getRooms().filter((r) => r.roomId === roomId)[0];
-  debugger;
   if (!room) {
     return <div>User is not in room {room}</div>;
   }
@@ -48,7 +45,7 @@ function ProjectChat(loginParams: LoginParams) {
   );
 }
 
-type LoginParams = { userId: number; projectId: number; teamId: number };
+type LoginParams = { userId: string; projectId: number; teamId: number };
 
 function Login({ onLogin }: { onLogin: (login: LoginParams) => void }) {
   const [userId, setUserId] = useState(123);
@@ -84,7 +81,7 @@ function Login({ onLogin }: { onLogin: (login: LoginParams) => void }) {
       <button
         type="submit"
         onClick={(e) => {
-          onLogin({ userId, teamId, projectId });
+          onLogin({ userId: userId.toFixed(0), teamId, projectId });
           e.preventDefault();
         }}
       >
