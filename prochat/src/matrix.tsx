@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import * as matrixSdk from "matrix-js-sdk";
-import { ClientEvent } from "matrix-js-sdk";
+import { ClientEvent, RoomMemberEvent } from "matrix-js-sdk";
 
 const tokenEndpoint = "/prochat/oidc/token";
 const helperEndpoint = "/prochat/helper/";
@@ -24,8 +24,8 @@ async function refresh(token: ExchangeTokenResponse) {
   const res = await fetch(tokenEndpoint, {
     method: "POST",
     headers: {
-      Authorization:
-        "Basic " + btoa(`0000000000000000000SYNAPSE:SomeRandomSecret`),
+      Authorization: "Basic " +
+        btoa(`0000000000000000000SYNAPSE:SomeRandomSecret`),
     },
     body: new URLSearchParams({
       client_id: "0000000000000000000SYNAPSE",
@@ -47,8 +47,8 @@ async function getUserToken(
     method: "POST",
     headers: {
       "jukwaa-infos": JSON.stringify({ user: { ...jukwaaInfos } }),
-      Authorization:
-        "Basic " + btoa(`0000000000000000000SYNAPSE:SomeRandomSecret`),
+      Authorization: "Basic " +
+        btoa(`0000000000000000000SYNAPSE:SomeRandomSecret`),
     },
     body: new URLSearchParams({
       client_id: "0000000000000000000SYNAPSE",
@@ -127,6 +127,14 @@ export function useMatrix(jukwaaInfos: JukwaaInfos) {
       console.log("STATE --- " + state);
       if (state !== "PREPARED") return;
       setMatrixClient(client);
+    });
+
+    client.on(RoomMemberEvent.Membership, function (_event, member) {
+      if (
+        member.membership === "invite" && member.userId === newTokens.username
+      ) {
+        client.joinRoom(member.roomId);
+      }
     });
     client.startClient({
       pollTimeout: 3000,
