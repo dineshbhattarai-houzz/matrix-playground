@@ -1,8 +1,9 @@
-import { createContext, useEffect, useMemo, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import * as matrixSdk from "matrix-js-sdk";
+import { ClientEvent } from "matrix-js-sdk";
 
-const tokenEndpoint = "https://teamchat.eks-saas.staging.houzz.net/oidc/token";
-const helperEndpoint = "https://teamchat.eks-saas.staging.houzz.net/helper/";
+const tokenEndpoint = "/prochat/oidc/token";
+const helperEndpoint = "/prochat/helper/";
 const serverName = `teamchat.eks-saas.staging.houzz.net`;
 type ExchangeTokenResponse = {
   access_token: string;
@@ -13,16 +14,18 @@ type ExchangeTokenResponse = {
   username: string;
 };
 
-export const MatrixContext = createContext(matrixSdk.createClient({
-  baseUrl: "https://teamchat.eks-saas.staging.houzz.net",
-}));
+export const MatrixContext = createContext(
+  matrixSdk.createClient({
+    baseUrl: "https://teamchat.eks-saas.staging.houzz.net",
+  }),
+);
 
 async function refresh(token: ExchangeTokenResponse) {
   const res = await fetch(tokenEndpoint, {
     method: "POST",
     headers: {
-      "Authorization": "Basic " +
-        btoa(`0000000000000000000SYNAPSE:SomeRandomSecret`),
+      Authorization:
+        "Basic " + btoa(`0000000000000000000SYNAPSE:SomeRandomSecret`),
     },
     body: new URLSearchParams({
       client_id: "0000000000000000000SYNAPSE",
@@ -43,9 +46,9 @@ async function getUserToken(
   const res = await fetch(tokenEndpoint, {
     method: "POST",
     headers: {
-      "jukwaa-infos": JSON.stringify({ ...jukwaaInfos }),
-      "Authorization": "Basic " +
-        btoa(`0000000000000000000SYNAPSE:SomeRandomSecret`),
+      "jukwaa-infos": JSON.stringify({ user: { ...jukwaaInfos } }),
+      Authorization:
+        "Basic " + btoa(`0000000000000000000SYNAPSE:SomeRandomSecret`),
     },
     body: new URLSearchParams({
       client_id: "0000000000000000000SYNAPSE",
@@ -72,65 +75,60 @@ function getDeviceID() {
   return newId;
 }
 
-type JukwaaInfos = { user: { userId: string } };
+type JukwaaInfos = { userId: number; teamId: number };
+
+export class HelperClient {
+  private jukwaaInfos: JukwaaInfos;
+
+  constructor(jukwaaInfos: JukwaaInfos) {
+    this.jukwaaInfos = jukwaaInfos;
+  }
+
+  async getRoomId(projectId: number) {
+    const headers = {
+      "jukwaa-infos": JSON.stringify({ user: this.jukwaaInfos }),
+    };
+    const params = new URLSearchParams({
+      projectId: "" + projectId,
+    });
+    const response = await fetch(
+      helperEndpoint + "getOrCreateProjectRoom?" + params.toString(),
+      { headers },
+    );
+    if (!response.ok) {
+      throw new Error("Failed to get room");
+    }
+    const payload = await response.json();
+
+    return payload.roomId;
+  }
+}
 
 export function useMatrix(jukwaaInfos: JukwaaInfos) {
   const [matrixClient, setMatrixClient] = useState<matrixSdk.MatrixClient>();
   const [userTokens, setUserTokens] = useState<ExchangeTokenResponse>();
-  const helperClient = useMemo(() => ({
-    async getRoomId(projectId: number) {
-      console.log("running getRoomId by project id");
-      const roomName = "hz_p" + projectId;
-      console.log(roomName);
-      try {
-        const roomAlias = await matrixClient?.getRoomIdForAlias(
-          '#' + roomName + ":" + serverName,
-        );
-        console.log({ roomAlias });
-        if (roomAlias) {
-          return roomAlias.room_id;
-        }
-      } catch (e) {
-      }
-
-      // fixme: this will create their own version of roomId for each project.
-      // this should be done in server
-      const result = await matrixClient?.createRoom({
-        name: "Project " + projectId,
-        room_alias_name: roomName,
-        is_direct: false,
-        visibility: matrixSdk.Visibility.Private,
-        preset: matrixSdk.Preset.TrustedPrivateChat,
-        invite: [
-          `@hz_${Number(jukwaaInfos.user.userId) + 1}:${serverName}`,
-          `@hz_${Number(jukwaaInfos.user.userId) + 2}:${serverName}`,
-        ],
-      });
-      if (!result) {
-        console.error("error creating room", result);
-        alert("error creating room " + roomName);
-      }
-      return result?.room_id;
-    },
-  }), [jukwaaInfos]);
 
   async function createClient() {
     const newTokens = await getUserToken(jukwaaInfos, getDeviceID());
     setUserTokens(newTokens);
 
-    window.setInterval(async () => {
-      if (userTokens) {
-        const newTokens = await refresh(userTokens);
-        setUserTokens(newTokens);
-      }
-    }, newTokens.expires_in * 1000 / 2);
+    window.setInterval(
+      async () => {
+        if (userTokens) {
+          const newTokens = await refresh(userTokens);
+          setUserTokens(newTokens);
+        }
+      },
+      (newTokens.expires_in * 1000) / 2,
+    );
 
     const client = matrixSdk.createClient({
       baseUrl: "https://teamchat.eks-saas.staging.houzz.net",
       userId: newTokens.username,
       accessToken: newTokens.access_token,
     });
-    client.on("sync", async function (state: string) {
+    client.on(ClientEvent.Sync, async function (state: string) {
+      console.log("STATE --- " + state);
       if (state !== "PREPARED") return;
       setMatrixClient(client);
     });
@@ -149,5 +147,5 @@ export function useMatrix(jukwaaInfos: JukwaaInfos) {
     }
   }, [matrixClient, userTokens]);
 
-  return { matrixClient, helperClient };
+  return { matrixClient };
 }
