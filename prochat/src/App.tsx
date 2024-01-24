@@ -1,82 +1,107 @@
-import {useContext, useEffect, useState} from 'react';
-import './App.css';
-import { MatrixContext, useMatrix } from './matrix';
+import { useContext, useEffect, useState } from "react";
+import "./App.css";
+import { HelperClient, MatrixContext, useMatrix } from "./matrix";
 
-function ProjectChat({ projectId, userId }: LoginParams) {
-  const { matrixClient, helperClient } = useMatrix({user: {userId}});
-  const [roomId, setRoomId] = useState<string | null>(null)
+function ProjectChat(loginParams: LoginParams) {
+  const { matrixClient } = useMatrix(loginParams);
+  const [roomId, setRoomId] = useState<string | null>(null);
 
   useEffect(() => {
-    if(!matrixClient){
+    if (!matrixClient) {
       return;
     }
-    async function init()
-    {
-      const roomId = await helperClient.getRoomId(projectId);
-      if(roomId){
-        setRoomId(roomId);
-      }
+    async function init() {
+      const helper = new HelperClient(loginParams);
+      console.log("Getting room for project " + loginParams.projectId);
+      const roomId = await helper.getRoomId(loginParams.projectId);
+      setRoomId(roomId);
     }
 
     init();
   }, [matrixClient]);
 
   if (!matrixClient) {
+    debugger;
     return <></>;
   }
 
-  if(matrixClient.getRooms().length === 0){
-    return <div>User does not have any rooms.</div>
+  debugger;
+  if (matrixClient.getRooms().length === 0) {
+    return <div>User does not have any rooms.</div>;
   }
 
-  if(!roomId){
-    return <div>Can't find project room {roomId}</div>
+  if (!roomId) {
+    return <div>Can't find project room {roomId}</div>;
   }
 
-  const room = matrixClient.getRooms().filter(r => r.roomId === roomId)[0]
-  if(!room){
-    return <div>User is not in room {room}</div>
+  const room = matrixClient.getRooms().filter((r) => r.roomId === roomId)[0];
+  debugger;
+  if (!room) {
+    return <div>User is not in room {room}</div>;
   }
 
   return (
-      <MatrixContext.Provider value={matrixClient}>
-        <MatrixRoomViewer roomId={roomId} ></MatrixRoomViewer>
-      </MatrixContext.Provider>
+    <MatrixContext.Provider value={matrixClient}>
+      <div>Room Id: {roomId}</div>
+      <MatrixRoomViewer roomId={roomId}></MatrixRoomViewer>
+    </MatrixContext.Provider>
   );
 }
 
-type LoginParams = { userId: string, projectId: number, teamId: number };
+type LoginParams = { userId: number; projectId: number; teamId: number };
 
-function Login({onLogin}: {onLogin: (login: LoginParams) => void}) {
-  const [userId, setUserId] = useState('231');
+function Login({ onLogin }: { onLogin: (login: LoginParams) => void }) {
+  const [userId, setUserId] = useState(123);
   const [projectId, setProjectId] = useState(345);
   const [teamId, setTeamId] = useState(456);
 
-  return <form className="login-screen">
+  return (
+    <form className="login-screen">
       <label>
         <span>User Id:</span>
-        <input type="text" value={userId} onChange={e => setUserId(Number(e.currentTarget.value).toFixed(0))} />
+        <input
+          type="text"
+          value={userId}
+          onChange={(e) => setUserId(Number(e.currentTarget.value))}
+        />
       </label>
-    <label>
-      <span>Team Id:</span>
-      <input type="text" value={teamId} onChange={e => setTeamId(Number(e.currentTarget.value))} />
-    </label>
+      <label>
+        <span>Team Id:</span>
+        <input
+          type="text"
+          value={teamId}
+          onChange={(e) => setTeamId(Number(e.currentTarget.value))}
+        />
+      </label>
       <label>
         <span>Project Id:</span>
-        <input type="text" value={projectId} onChange={e => setProjectId(Number(e.currentTarget.value))} />
+        <input
+          type="text"
+          value={projectId}
+          onChange={(e) => setProjectId(Number(e.currentTarget.value))}
+        />
       </label>
-    <button type="submit" onClick={() => onLogin({userId, teamId, projectId})}>Login</button>
-  </form>
+      <button
+        type="submit"
+        onClick={(e) => {
+          onLogin({ userId, teamId, projectId });
+          e.preventDefault();
+        }}
+      >
+        Login
+      </button>
+    </form>
+  );
 }
 
 function App() {
-  const [login, setLogin] = useState<LoginParams | null>(null)
+  const [login, setLogin] = useState<LoginParams | null>(null);
 
   if (!login) {
-    return <Login onLogin={setLogin} />
+    return <Login onLogin={setLogin} />;
   }
 
-  return <ProjectChat {...login} />
+  return <ProjectChat {...login} />;
 }
 export default App;
 
@@ -85,33 +110,34 @@ const MatrixRoomViewer = ({ roomId }: { roomId: string }) => {
 
   const room = matrixClient.getRoom(roomId);
   if (!room) {
-    return <div>Room not found</div>
+    return <div>Room not found</div>;
   }
 
   const timeline = room.getLiveTimeline();
   const events = timeline.getEvents();
-  console.log(events)
+  console.log(events);
   const messages = events.map((event) => ({
     sender: event.sender?.name ?? "",
     message: event.getContent().body,
   }));
   const sendMessage = () => {
-    matrixClient.sendMessage(roomId, {msgtype: 'm.text', body: "hello", "m.mentions": {}})
-  }
+    matrixClient.sendMessage(roomId, {
+      msgtype: "m.text",
+      body: "hello",
+      "m.mentions": {},
+    });
+  };
 
   return (
     <div>
       <h3>{roomId}</h3>
-      {
-        messages.map((msg, index) => (
-          <div key={index}>
-            <strong>{msg.sender}</strong>: {msg.message}
-          </div>
-        ))
-      }
+      {messages.map((msg, index) => (
+        <div key={index}>
+          <strong>{msg.sender}</strong>: {msg.message}
+        </div>
+      ))}
 
       <button onClick={sendMessage}>Send</button>
     </div>
   );
 };
-
